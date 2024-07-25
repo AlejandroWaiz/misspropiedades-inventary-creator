@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h1 id="greeting" style="font-family: Arial, sans-serif;">Hola</h1>
+    <input type="text" id="fileName" placeholder="Introduce el nombre del archivo Word">
+    <button onclick="getFileName()">Enviar</button>
+    <p id="message"></p>
+
+    <script>
+        const { ipcRenderer } = require('electron')
+
+        function getFileName() {
+            const fileName = document.getElementById('fileName').value
+            ipcRenderer.send('get-file-name', fileName)
+        }
+
+        ipcRenderer.on('file-created', (event, message) => {
+            document.getElementById('message').textContent = message;
+        });
+    </script>
+</body>
+</html>

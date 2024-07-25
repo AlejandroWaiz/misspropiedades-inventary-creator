@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "docx": "^8.5.0",
+    "electron": "^31.3.0"
+  }
+}
