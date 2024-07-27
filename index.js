@@ -34,7 +34,18 @@ app.on('window-all-closed', () => {
 })
 
 ipcMain.on('get-file-name', async (event, fileName) => {
-  const images = fs.readdirSync("./images").filter(file => file.endsWith(".jpg") || file.endsWith(".jpeg") || file.endsWith(".png") || file.endsWith(".HEIC"));
+  
+
+  let images;
+try {
+  //Para local
+  //images = fs.readdirSync("./images").filter(file => file.endsWith(".jpg") || file.endsWith(".jpeg") || file.endsWith(".png") || file.endsWith(".HEIC"));
+  images = fs.readdirSync("./resources/app/images").filter(file => file.endsWith(".jpg") || file.endsWith(".jpeg") || file.endsWith(".png") || file.endsWith(".HEIC"));
+} catch (error) {
+  console.error('Error al leer los archivos de la carpeta:', error);
+  event.reply('file-created', 'Hubo un error al leer los archivos de la carpeta');
+  return;
+}
   
   try {
 
@@ -44,7 +55,7 @@ ipcMain.on('get-file-name', async (event, fileName) => {
   } catch (error) {
 
     console.error('Error al crear el archivo Word:', error);
-    event.reply('file-created', 'Hubo un error al crear el archivo');
+    event.reply('file-created', 'Hubo un error al crear el archivo: ' + error.message);
 
   }
 

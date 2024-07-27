@@ -21,8 +21,13 @@
         }
 
         ipcRenderer.on('file-created', (event, message) => {
-            document.getElementById('message').textContent = message;
-        });
+  document.getElementById('message').textContent = message;
+  if (message.startsWith('Hubo un error')) {
+    document.getElementById('message').style.color = 'red';
+  } else {
+    document.getElementById('message').style.color = 'green';
+  }
+});
 
         ipcRenderer.on('progress', (event, progress) => {
             document.getElementById('progressBar').value = progress;

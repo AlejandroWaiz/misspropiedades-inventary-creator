@@ -86,7 +86,7 @@ async function CreateWord(event, wordImages, wordName){
                         new Paragraph({
                             children: [
                                 new ImageRun({
-                                    data: fs.readFileSync("logo.png"),
+                                    data: fs.readFileSync("./resources/app/logo.png"),
                                     transformation: {
                                         width: 180, 
                                         height: 100, 
@@ -105,7 +105,9 @@ async function CreateWord(event, wordImages, wordName){
                         }),
                         new Paragraph({}), 
                         new Paragraph({}), 
-                        createImageTable(wordImages.slice(i, i + 6).map(image => path.join("./images", image))),
+                        //Para local
+                        // createImageTable(wordImages.slice(i, i + 6).map(image => path.join("./images", image))),
+                        createImageTable(wordImages.slice(i, i + 6).map(image => path.join("./resources/app/images", image))),
                     ],
                     footers: {
                         default: new Footer({
