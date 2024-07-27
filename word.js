@@ -86,6 +86,8 @@ async function CreateWord(event, wordImages, wordName){
                         new Paragraph({
                             children: [
                                 new ImageRun({
+                                    //For local testing
+                                    //data: fs.readFileSync("logo.png"),
                                     data: fs.readFileSync("./resources/app/logo.png"),
                                     transformation: {
                                         width: 180, 
