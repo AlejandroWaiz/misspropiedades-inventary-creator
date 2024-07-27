@@ -19,6 +19,10 @@ const path = require("path");
 const fs = require("fs");
 
 
+function cmToPt(cm) {
+    return cm * 0.3937 * 72;
+}
+
 function createImageCell(imagePath) {
     return new TableCell({
         children: [
@@ -27,15 +31,15 @@ function createImageCell(imagePath) {
                     new ImageRun({
                         data: fs.readFileSync(imagePath),
                         transformation: {
-                            width: 210, 
-                            height: 250,
+                            width: cmToPt(9.12), 
+                            height: cmToPt(6.83), 
                         },
                     }),
                 ],
                 alignment: AlignmentType.CENTER,
             }),
         ],
-        margins: { top: 0, bottom: 0, left: 0, right: 0 },
+        margins: { top: cmToPt(0.5), bottom: cmToPt(0.5), left: cmToPt(0.5), right: cmToPt(0.5) }, // margen de 0.5 cms
     });
 }
 
@@ -47,9 +51,10 @@ function createEmptyCell() {
                 alignment: AlignmentType.CENTER,
             }),
         ],
-        margins: { top: 0, bottom: 0, left: 0, right: 0 },
+        margins: { top: cmToPt(2), bottom: cmToPt(2), left: cmToPt(2), right: cmToPt(2) }, // margen de 0.5 cms
     });
 }
+
 
 function createImageTable(images) {
     const rows = [];
@@ -87,8 +92,8 @@ async function CreateWord(event, wordImages, wordName){
                             children: [
                                 new ImageRun({
                                     //For local testing
-                                    //data: fs.readFileSync("logo.png"),
-                                    data: fs.readFileSync("./resources/app/logo.png"),
+                                    data: fs.readFileSync("logo.png"),
+                                    //data: fs.readFileSync("./resources/app/logo.png"),
                                     transformation: {
                                         width: 180, 
                                         height: 100, 
@@ -108,8 +113,8 @@ async function CreateWord(event, wordImages, wordName){
                         new Paragraph({}), 
                         new Paragraph({}), 
                         //Para local
-                        // createImageTable(wordImages.slice(i, i + 6).map(image => path.join("./images", image))),
-                        createImageTable(wordImages.slice(i, i + 6).map(image => path.join("./resources/app/images", image))),
+                         createImageTable(wordImages.slice(i, i + 6).map(image => path.join("./images", image))),
+                        //createImageTable(wordImages.slice(i, i + 6).map(image => path.join("./resources/app/images", image))),
                     ],
                     footers: {
                         default: new Footer({
