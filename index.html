@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html>
-<body>
-    <h1 id="greeting" style="font-family: Arial, sans-serif;">Hola</h1>
+<body style="margin-top: 210px;">
+    <img src="logo.png" style="position: absolute; top: 0; left: 0; width: 600px; height: 200px;">
+    <h1 id="greeting" style="font-family: Arial, sans-serif;">¡Bienvenid@ al creador de inventarios!</h1>
     <input type="text" id="fileName" placeholder="Introduce el nombre del archivo Word">
     <button onclick="getFileName()">Enviar</button>
+    <p id="loadingText" style="display: none;">Cargando fotos...</p>
+    <progress id="progressBar" value="0" max="100" style="display: none;"></progress>
     <p id="message"></p>
 
     <script>
@@ -11,11 +14,26 @@
 
         function getFileName() {
             const fileName = document.getElementById('fileName').value
-            ipcRenderer.send('get-file-name', fileName)
+            if (fileName) {
+                document.getElementById('progressBar').style.display = 'block';
+                ipcRenderer.send('get-file-name', fileName)
+            }
         }
 
         ipcRenderer.on('file-created', (event, message) => {
             document.getElementById('message').textContent = message;
+        });
+
+        ipcRenderer.on('progress', (event, progress) => {
+            document.getElementById('progressBar').value = progress;
+            if (progress < 100) {
+                document.getElementById('loadingText').style.display = 'block';
+                document.getElementById('loadingText').textContent = 'Cargando fotos' + '.'.repeat(Math.floor(progress / 33) % 4);
+            } else {
+                document.getElementById('loadingText').style.display = 'none';
+                document.getElementById('progressBar').style.display = 'none';
+                document.getElementById('message').textContent = 'Creando word...';
+            }
         });
     </script>
 </body>

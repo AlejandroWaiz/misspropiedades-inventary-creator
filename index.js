@@ -5,7 +5,7 @@ const CreateWord = require("./word").CreateWord;
 
 function createWindow () {
   const win = new BrowserWindow({
-    width: 800,
+    width: 600,
     height: 600,
     webPreferences: {
       nodeIntegration: true,
@@ -35,6 +35,17 @@ app.on('window-all-closed', () => {
 
 ipcMain.on('get-file-name', async (event, fileName) => {
   const images = fs.readdirSync("./images").filter(file => file.endsWith(".jpg") || file.endsWith(".jpeg") || file.endsWith(".png") || file.endsWith(".HEIC"));
-  CreateWord(images, fileName);
-  event.reply('file-created', 'Todo listo');
-})
+  
+  try {
+
+    await CreateWord(event, images, fileName);
+    event.reply('file-created', 'Todo listo');
+
+  } catch (error) {
+
+    console.error('Error al crear el archivo Word:', error);
+    event.reply('file-created', 'Hubo un error al crear el archivo');
+
+  }
+
+});

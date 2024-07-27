@@ -72,53 +72,65 @@ const contactInfo = new Paragraph({
     floating: VerticalPosition
 });
 
-async function CreateWord(wordImages, wordName){
+async function CreateWord(event, wordImages, wordName){
+    return new Promise (async (resolve, reject) => {
 
-    try {
-        
-        for (let i = 0; i < wordImages.length; i += 6) {
-            sections.push({
-                children: [
-                    new Paragraph({
-                        children: [
-                            new ImageRun({
-                                data: fs.readFileSync("logo.png"),
-                                transformation: {
-                                    width: 180, 
-                                    height: 100, 
-                                },
-                            }),
-                        ],
-                        alignment: AlignmentType.LEFT,
-                    }),
-                    new Paragraph({}), 
-                    new Paragraph({}), 
-                    new Paragraph({
-                        children: [
-                            new TextRun("REGISTRO FOTOGRÁFICO"),
-                        ],
-                        alignment: AlignmentType.CENTER,
-                    }),
-                    new Paragraph({}), 
-                    new Paragraph({}), 
-                    createImageTable(wordImages.slice(i, i + 6).map(image => path.join("./images", image))),
-                ],
-                footers: {
-                    default: new Footer({
-                        children: [contactInfo],
-                    }),
-                },
-            });
+        try {
+
+            const totalImages = wordImages.length;
+            let processedImages = 0;
+
+            for (let i = 0; i < wordImages.length; i += 6) {
+                sections.push({
+                    children: [
+                        new Paragraph({
+                            children: [
+                                new ImageRun({
+                                    data: fs.readFileSync("logo.png"),
+                                    transformation: {
+                                        width: 180, 
+                                        height: 100, 
+                                    },
+                                }),
+                            ],
+                            alignment: AlignmentType.LEFT,
+                        }),
+                        new Paragraph({}), 
+                        new Paragraph({}), 
+                        new Paragraph({
+                            children: [
+                                new TextRun("REGISTRO FOTOGRÁFICO"),
+                            ],
+                            alignment: AlignmentType.CENTER,
+                        }),
+                        new Paragraph({}), 
+                        new Paragraph({}), 
+                        createImageTable(wordImages.slice(i, i + 6).map(image => path.join("./images", image))),
+                    ],
+                    footers: {
+                        default: new Footer({
+                            children: [contactInfo],
+                        }),
+                    },
+                });
+
+                processedImages += 6;
+                const progress = Math.min((processedImages / totalImages) * 100, 100);
+                event.sender.send('progress', progress);
+
+            }
+    
+            const doc = new Document({ sections });
+    
+            const buffer = await Packer.toBuffer(doc);
+            fs.writeFileSync(wordName + ".docx", buffer);
+
+            resolve();
+        } catch (error) {
+            console.error('Error al crear el archivo Word:', error);
+            reject(error);
         }
-
-        const doc = new Document({ sections });
-
-        const buffer = await Packer.toBuffer(doc);
-        fs.writeFileSync(wordName + ".docx", buffer);
-
-    } catch (error) {
-        console.error('Error al crear el archivo Word:', error);
-    }
+    });
 }
-
+    
 module.exports = {CreateWord}
