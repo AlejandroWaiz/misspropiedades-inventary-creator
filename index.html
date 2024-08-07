@@ -1,10 +1,14 @@
 <!DOCTYPE html>
 <html>
-<body style="margin-top: 210px;">
-    <img src="logo.png" style="position: absolute; top: 0; left: 0; width: 600px; height: 200px;">
+<body style="margin-top: 0px;">
+    <!-- Para local-->
+    <!--<img src="logo.png" style="display: block; max-width: 100%; height: 200px;">-->
+    <!-- Para el build-->
+    <img src="./resources/app/logo.png" style="display: block; max-width: 100%; height: 200px;">
     <h1 id="greeting" style="font-family: Arial, sans-serif;">¡Bienvenid@ al creador de inventarios!</h1>
-    <input type="text" id="fileName" placeholder="Introduce el nombre del archivo Word">
-    <button onclick="getFileName()">Enviar</button>
+    <input type="text" id="folderName" style="width: 300px;" placeholder="Nombre carpeta con imagenes (default: imagenes-inventario)">
+    <input type="text" id="fileName" style="width: 300px;" placeholder="Introduce el nombre del archivo Word">
+    <button onclick="getFileName()">Crear</button>
     <p id="loadingText" style="display: none;">Cargando fotos...</p>
     <progress id="progressBar" value="0" max="100" style="display: none;"></progress>
     <p id="message"></p>
@@ -13,21 +17,22 @@
         const { ipcRenderer } = require('electron')
 
         function getFileName() {
-            const fileName = document.getElementById('fileName').value
+            const folderName = document.getElementById('folderName').value || 'imagenes-inventario';
+            const fileName = document.getElementById('fileName').value;
             if (fileName) {
                 document.getElementById('progressBar').style.display = 'block';
-                ipcRenderer.send('get-file-name', fileName)
+                ipcRenderer.send('get-file-name', { folderName, fileName });
             }
         }
 
         ipcRenderer.on('file-created', (event, message) => {
-  document.getElementById('message').textContent = message;
-  if (message.startsWith('Hubo un error')) {
-    document.getElementById('message').style.color = 'red';
-  } else {
-    document.getElementById('message').style.color = 'green';
-  }
-});
+            document.getElementById('message').textContent = message;
+            if (message.startsWith('Hubo un error')) {
+                document.getElementById('message').style.color = 'red';
+            } else {
+                document.getElementById('message').style.color = 'green';
+            }
+        });
 
         ipcRenderer.on('progress', (event, progress) => {
             document.getElementById('progressBar').value = progress;
