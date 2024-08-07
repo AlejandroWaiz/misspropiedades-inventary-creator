@@ -2,11 +2,12 @@ const { app, BrowserWindow, dialog, ipcMain } = require('electron')
 const path = require('path')
 const fs = require("fs");
 const CreateWord = require("./word").CreateWord;
+const os = require("os");
 
 function createWindow () {
   const win = new BrowserWindow({
     width: 600,
-    height: 600,
+    height: 500,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -33,30 +34,13 @@ app.on('window-all-closed', () => {
   }
 })
 
-ipcMain.on('get-file-name', async (event, fileName) => {
-  
 
-  let images;
-try {
-  //Para local
-  //images = fs.readdirSync("./images").filter(file => file.endsWith(".jpg") || file.endsWith(".jpeg") || file.endsWith(".png") || file.endsWith(".HEIC"));
-  images = fs.readdirSync("./resources/app/images").filter(file => file.endsWith(".jpg") || file.endsWith(".jpeg") || file.endsWith(".png") || file.endsWith(".HEIC"));
-} catch (error) {
-  console.error('Error al leer los archivos de la carpeta:', error);
-  event.reply('file-created', 'Hubo un error al leer los archivos de la carpeta');
-  return;
-}
-  
+ipcMain.on('get-file-name', async (event, { folderName, fileName }) => {
   try {
-
-    await CreateWord(event, images, fileName);
-    event.reply('file-created', 'Todo listo');
-
+      await CreateWord(event, folderName, fileName);
+      event.reply('file-created', 'Todo listo');
   } catch (error) {
-
-    console.error('Error al crear el archivo Word:', error);
-    event.reply('file-created', 'Hubo un error al crear el archivo: ' + error.message);
-
+      console.error('Error al crear el archivo Word:', error);
+      event.reply('file-created', 'Hubo un error al crear el archivo: ' + error.message);
   }
-
 });
