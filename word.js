@@ -17,7 +17,7 @@ const {
 
 const path = require("path");
 const fs = require("fs");
-
+const os = require("os");
 
 function cmToPt(cm) {
     return cm * 0.3937 * 72;
@@ -31,8 +31,8 @@ function createImageCell(imagePath) {
                     new ImageRun({
                         data: fs.readFileSync(imagePath),
                         transformation: {
-                            width: cmToPt(9.12), 
-                            height: cmToPt(6.83), 
+                            width: cmToPt(12.14), 
+                            height: cmToPt(9.12), 
                         },
                     }),
                 ],
@@ -55,7 +55,6 @@ function createEmptyCell() {
     });
 }
 
-
 function createImageTable(images) {
     const rows = [];
     for (let i = 0; i < images.length; i += 2) {
@@ -71,7 +70,9 @@ const sections = [];
 const contactInfo = new Paragraph({
     children: [
         new TextRun("CORREDORA MISS PROPIEDADES"),
-        new TextRun("Contacto: +56 9 3684 0456 / contacto@misspropiedades.cl / www.misspropiedades.cl"),
+        new TextRun({
+            text: "\nContacto: +56 9 3684 0456 / contacto@misspropiedades.cl / www.misspropiedades.cl", break: 1}
+        ),
     ],
     alignment: AlignmentType.CENTER,
     floating: VerticalPosition
@@ -82,27 +83,56 @@ async function CreateWord(event, wordImages, wordName){
 
         try {
 
+            //Build para mac
+            //const imagenesPath = path.join(os.homedir(), 'Desktop', folderName || 'imagenes-inventario');
+            //const logoPath = path.join(os.homedir(), 'Desktop', 'logo.png');
+
+            //Local
+            const imagenesPath = path.join('./images');
+            const logoPath = path.join('logo.png');
+
+            const wordImages = fs.readdirSync(imagenesPath).filter(file => {
+                const ext = path.extname(file).toLowerCase();
+                return !['.mp4', '.mov', '.avi', '.mkv'].includes(ext);
+            });
+            
             const totalImages = wordImages.length;
             let processedImages = 0;
 
             for (let i = 0; i < wordImages.length; i += 6) {
                 sections.push({
+                    properties: {
+                        page: {
+                            margin: {
+                                top: 233.8, // 3.3 cm
+                                right: 141.7, // 1.5 cm
+                                bottom: 198.4, // 3.5 cm
+                                left: 141.7, // 1.5 cm
+                                gutter: 0, // 0 cm
+                                gutterPosition: 'left', 
+                            },
+                        },
+                    },
                     children: [
                         new Paragraph({
                             children: [
                                 new ImageRun({
-                                    //For local testing
-                                    data: fs.readFileSync("logo.png"),
-                                    //data: fs.readFileSync("./resources/app/logo.png"),
+                                    data: logo,
                                     transformation: {
-                                        width: 180, 
-                                        height: 100, 
+                                        width: 150, 
+                                        height: 130, 
+                                    },
+                                    spacing: {
+                                        before: 2000000,
+                                        after: 0,
+                                    },
+                                    indent: {
+                                        left: 5000000
                                     },
                                 }),
                             ],
                             alignment: AlignmentType.LEFT,
                         }),
-                        new Paragraph({}), 
                         new Paragraph({}), 
                         new Paragraph({
                             children: [
@@ -113,7 +143,8 @@ async function CreateWord(event, wordImages, wordName){
                         new Paragraph({}), 
                         new Paragraph({}), 
                         //Para local
-                         createImageTable(wordImages.slice(i, i + 6).map(image => path.join("./images", image))),
+                        createImageTable(wordImages.slice(i, i + 6).map(image => path.join(imagenesPath, image))),
+                        //Para el build
                         //createImageTable(wordImages.slice(i, i + 6).map(image => path.join("./resources/app/images", image))),
                     ],
                     footers: {
@@ -132,7 +163,8 @@ async function CreateWord(event, wordImages, wordName){
             const doc = new Document({ sections });
     
             const buffer = await Packer.toBuffer(doc);
-            fs.writeFileSync(wordName + ".docx", buffer);
+            const wordPath = path.join(os.homedir(), 'Desktop', wordName + ".docx");
+            fs.writeFileSync(wordPath, buffer);
 
             resolve();
         } catch (error) {
