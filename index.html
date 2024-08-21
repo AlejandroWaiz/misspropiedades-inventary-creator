@@ -6,8 +6,11 @@
     <!-- Para el build-->
      <img src="./logo.png" style="display: block; max-width: 100%; height: 200px;">
     <h1 id="greeting" style="font-family: Arial, sans-serif;">¡Bienvenid@ al creador de inventarios!</h1>
-    <input type="text" id="fileName" style="width: 300px;" placeholder="Introduce el nombre del archivo Word">
-    <input type="text" id="imageFolder" style="width: 300px;" placeholder="¿En qué carpeta están las imágenes?">
+    <p>¿Como quieres que se llame el archivo?</p>
+    <input type="text" id="fileName" style="width: 300px;" placeholder="default: inventario-fecha">
+    <div></div>
+    <p>¿En que carpeta están las imagenes?</p>
+    <input type="text" id="imageFolder" style="width: 300px;" placeholder="default: imagenes-inventario">
     <button onclick="getFileName()">Crear</button>
     <p id="loadingText" style="display: none;">Cargando fotos...</p>
     <progress id="progressBar" value="0" max="100" style="display: none;"></progress>
@@ -17,7 +20,7 @@
         const { ipcRenderer } = require('electron')
 
         function getFileName() {
-            const fileName = document.getElementById('fileName').value;
+            const fileName = document.getElementById('fileName').value || `inventario-${new Date().toISOString().slice(0, 10)}`;;
             const imagesFolder = document.getElementById('imageFolder').value || 'imagenes-inventario';
             if (fileName) {
                 document.getElementById('progressBar').style.display = 'block';

@@ -79,19 +79,16 @@ const contactInfo = new Paragraph({
     floating: VerticalPosition
 });
 
-async function CreateWord(event, wordName, imagesFolder){
-    return new Promise (async (resolve, reject) => {
-
+async function CreateWord(event, wordName, imagesFolder) {
+    return new Promise(async (resolve, reject) => {
         try {
 
             //Build para mac
-            //const imagenesPath = path.join(os.homedir(), 'Desktop', folderName || 'imagenes-inventario');
-            //const logoPath = path.join(os.homedir(), 'Desktop', 'logo.png');
+            const imagenesPath = path.join(os.homedir(), 'Desktop', imagesFolder);
+            const logoPath = path.join(os.homedir(), 'Desktop', 'logo.png');
 
-            //Local
-            const imagenesPath = path.join('./images');
-            const logoPath = path.join('logo.png');
 
+            // Lee las imágenes
             const wordImages = fs.readdirSync(imagenesPath).filter(file => {
                 const ext = path.extname(file).toLowerCase();
                 return !['.mp4', '.mov', '.avi', '.mkv'].includes(ext);
@@ -99,6 +96,9 @@ async function CreateWord(event, wordName, imagesFolder){
             
             const totalImages = wordImages.length;
             let processedImages = 0;
+
+            // Crear las secciones
+            const sections = [];
 
             for (let i = 0; i < 5; i++) {
                 sections.push({
@@ -110,11 +110,12 @@ async function CreateWord(event, wordName, imagesFolder){
                                 bottom: 198.4, // 3.5 cm
                                 left: 141.7, // 1.5 cm
                                 gutter: 0, // 0 cm
-                                gutterPosition: 'left', 
+                                gutterPosition: 'left',
                             },
                         },
                     },
-                })
+                    children: [],
+                });
             }
 
             for (let i = 0; i < wordImages.length; i += 6) {
@@ -127,30 +128,29 @@ async function CreateWord(event, wordName, imagesFolder){
                                 bottom: 198.4, // 3.5 cm
                                 left: 141.7, // 1.5 cm
                                 gutter: 0, // 0 cm
-                                gutterPosition: 'left', 
+                                gutterPosition: 'left',
                             },
                         },
                     },
-                    children: [
-                        new Paragraph({
+                    headers: {
+                        default: new Header({
                             children: [
-                                new ImageRun({
-                                    data: logo,
-                                    transformation: {
-                                        width: 150, 
-                                        height: 130, 
-                                    },
-                                    spacing: {
-                                        before: 2000000,
-                                        after: 0,
-                                    },
-                                    indent: {
-                                        left: 5000000
-                                    },
+                                new Paragraph({
+                                    children: [
+                                        new ImageRun({
+                                            data: fs.readFileSync(logoPath),
+                                            transformation: {
+                                                width: 150,
+                                                height: 130,
+                                            },
+                                        }),
+                                    ],
+                                    alignment: AlignmentType.LEFT,
                                 }),
                             ],
-                            alignment: AlignmentType.LEFT,
                         }),
+                    },
+                    children: [
                         new Paragraph({}), 
                         new Paragraph({
                             children: [
@@ -160,14 +160,11 @@ async function CreateWord(event, wordName, imagesFolder){
                         }),
                         new Paragraph({}), 
                         new Paragraph({}), 
-                        //Para local
                         createImageTable(wordImages.slice(i, i + 6).map(image => path.join(imagenesPath, image))),
-                        //Para el build
-                        //createImageTable(wordImages.slice(i, i + 6).map(image => path.join("./resources/app/images", image))),
                     ],
                     footers: {
                         default: new Footer({
-                            children: [contactInfo],
+                            children: [new Paragraph("Contact Info")], // Asegúrate de definir `contactInfo` adecuadamente
                         }),
                     },
                 });
@@ -175,11 +172,9 @@ async function CreateWord(event, wordName, imagesFolder){
                 processedImages += 6;
                 const progress = Math.min((processedImages / totalImages) * 100, 100);
                 event.sender.send('progress', progress);
-
             }
-    
+
             const doc = new Document({ sections });
-    
             const buffer = await Packer.toBuffer(doc);
             const wordPath = path.join(os.homedir(), 'Desktop', wordName + ".docx");
             fs.writeFileSync(wordPath, buffer);
@@ -191,5 +186,6 @@ async function CreateWord(event, wordName, imagesFolder){
         }
     });
 }
+
     
 module.exports = {CreateWord}

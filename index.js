@@ -4,6 +4,8 @@ const fs = require("fs");
 const CreateWord = require("./word").CreateWord;
 const os = require("os");
 
+app.disableHardwareAcceleration();
+
 function createWindow () {
   const win = new BrowserWindow({
     width: 600,
