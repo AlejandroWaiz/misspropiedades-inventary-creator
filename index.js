@@ -34,32 +34,12 @@ app.on('window-all-closed', () => {
   }
 })
 
-ipcMain.on('get-file-name', async (event, fileName) => {
-  
-
-  let images;
-try {
-  //Para local
-  const imagenesPath = path.join(os.homedir(), 'Desktop', 'imagenes-inventario');
-  images = fs.readdirSync(imagenesPath).filter(file => file.endsWith(".jpg") || file.endsWith(".jpeg") || file.endsWith(".png") || file.endsWith(".HEIC"));
-  //Para el build
-//images = fs.readdirSync("./resources/app/images").filter(file => file.endsWith(".jpg") || file.endsWith(".jpeg") || file.endsWith(".png") || file.endsWith(".HEIC"));
-} catch (error) {
-  console.error('Error al leer los archivos de la carpeta:', error);
-  event.reply('file-created', 'Hubo un error al leer los archivos de la carpeta');
-  return;
-}
-  
+ipcMain.on('get-file-name', async (event, { fileName, imagesFolder }) => {
   try {
-
-    await CreateWord(event, images, fileName);
+    await CreateWord(event, fileName, imagesFolder);
     event.reply('file-created', 'Todo listo');
-
   } catch (error) {
-
     console.error('Error al crear el archivo Word:', error);
     event.reply('file-created', 'Hubo un error al crear el archivo: ' + error.message);
-
   }
-
 });
