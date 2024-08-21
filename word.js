@@ -78,7 +78,7 @@ const contactInfo = new Paragraph({
     floating: VerticalPosition
 });
 
-async function CreateWord(event, wordImages, wordName){
+async function CreateWord(event, wordName, imagesFolder){
     return new Promise (async (resolve, reject) => {
 
         try {
@@ -98,6 +98,23 @@ async function CreateWord(event, wordImages, wordName){
             
             const totalImages = wordImages.length;
             let processedImages = 0;
+
+            for (let i = 0; i < 5; i++) {
+                sections.push({
+                    properties: {
+                        page: {
+                            margin: {
+                                top: 233.8, // 3.3 cm
+                                right: 141.7, // 1.5 cm
+                                bottom: 198.4, // 3.5 cm
+                                left: 141.7, // 1.5 cm
+                                gutter: 0, // 0 cm
+                                gutterPosition: 'left', 
+                            },
+                        },
+                    },
+                })
+            }
 
             for (let i = 0; i < wordImages.length; i += 6) {
                 sections.push({
