@@ -65,6 +65,7 @@ function createImageTable(images) {
     return new Table({ rows, alignment: AlignmentType.CENTER }); 
 }
 
+
 const sections = [];
 
 const contactInfo = new Paragraph({
